@@ -1,0 +1,49 @@
+{
+  "$schema": "https://claude.ai/schemas/settings.json",
+  "description": "Delegation Toolkit - Simplified AI orchestration",
+  "version": "1.0",
+  "mcpServers": {
+    "delegation": {
+      "command": "python3",
+      "args": ["-m", "fastmcp", "run", ".claude/delegation/server.py"],
+      "description": "Routes tasks to Jules, Gemini CLI, QwenAgent, and Perplexity",
+      "tools": [
+        "delegate_code",
+        "delegate_research",
+        "delegation_status",
+        "run_tests"
+      ]
+    },
+    "perplexity-research": {
+      "command": "python3",
+      "args": ["-m", "src.mcp_servers.perplexity.server"],
+      "env": {
+        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}"
+      },
+      "description": "Perplexity research integration (alternative to Chrome extension)",
+      "status": "optional"
+    },
+    "postgres": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "DATABASE_URL",
+        "crystaldba/postgres-mcp"
+      ],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}"
+      },
+      "description": "PostgreSQL operations",
+      "status": "optional"
+    }
+  },
+  "environment": {
+    "required": [],
+    "optional": [
+      "DATABASE_URL",
+      "PERPLEXITY_API_KEY"
+    ]
+  },
+  "autoCompact": false,
+  "compactionThreshold": null
+}
