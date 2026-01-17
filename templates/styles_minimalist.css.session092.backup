@@ -1,0 +1,1040 @@
+/* Keswick Christian School - V5 Refined Minimalist Transcript */
+/* Addressing: watermark cutoff, header redesign, academic year in section headers, decile-only rank */
+
+:root {
+    --kcs-green: #1e5a3a;  /* Darker forest green matching logo */
+    --kcs-gold: #c9a961;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --border-color: #cccccc;
+    --kcs-dark-blue: #003366;
+}
+
+@page {
+    size: letter landscape;
+    margin: 0.5in 0.6in;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: 10pt;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+/* Page Container */
+.page {
+    position: relative;
+    width: 10in;
+    height: 7.5in;
+    page-break-after: always;
+    background: transparent;
+}
+
+/* Watermark - Centered, Full Size, No Cutoff */
+.watermark {
+    position: absolute;
+    top: 45%;  /* Adjusted to prevent bottom cutoff */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;  /* Slightly smaller to ensure no cutoff */
+    height: 450px;
+    background-image: url('../assets/watermarks/watermark.jpg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.11;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Typography */
+h1.title-word {
+    font-size: 24pt;
+    font-weight: bold;
+    color: var(--kcs-green);
+    letter-spacing: 2px;
+    line-height: 1.2;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--kcs-green);
+    border-bottom: 2px solid var(--kcs-green);
+    padding-bottom: 2px;
+    margin-bottom: 8px;
+}
+
+.section-title-minor {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--kcs-dark-blue);
+    border-bottom: 1px solid var(--kcs-dark-blue);
+    padding-bottom: 2px;
+    margin-bottom: 5px;
+}
+
+h3.grade-year {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10pt;
+    font-weight: bold;
+    color: var(--text-primary);
+    background-color: #f7f7f7;
+    padding: 4px 6px;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 4px;
+}
+
+h3.grade-year span:nth-child(1) {
+    text-align: left;
+    flex: 1;
+}
+
+h3.grade-year span:nth-child(2) {
+    text-align: right;
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 8.5pt;
+    color: var(--text-secondary);
+}
+
+h3.box-title {
+    font-size: 9pt;
+    font-weight: bold;
+    color: var(--kcs-green);
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 2px;
+}
+
+/* Redesigned Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0 10px 12px 10px;
+    border-bottom: 3px solid var(--kcs-green);
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    min-height: 95px;
+}
+
+.header-left {
+    flex: 0 0 280px;
+    display: flex;
+    align-items: flex-start;
+}
+
+.logo {
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 20px;
+    margin-top: 15px;
+}
+
+.header-right {
+    flex: 0 0 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+.student-name {
+    font-size: 16pt;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.student-detail {
+    font-size: 8.5pt;
+    color: var(--text-secondary);
+    margin: 3px 0;
+}
+
+/* Summary Bar */
+.summary-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 2px;
+}
+
+.summary-item .label {
+    font-size: 7.5pt;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.summary-item .value {
+    font-size: 13pt;
+    font-weight: bold;
+    color: var(--kcs-green);
+}
+
+/* Sections */
+.transcript-section {
+    margin-bottom: 16px;
+}
+
+.academic-record-page1 {
+    break-inside: avoid;
+}
+
+/* Early HS Credits */
+.ms-credits-section {
+    margin-bottom: 16px;
+}
+
+.ms-credits-title {
+    font-size: 9pt;
+    font-weight: bold;
+    color: var(--kcs-green);
+    margin-bottom: 4px;
+}
+
+.ms-credits-table {
+    width: 100%;
+    font-size: 8pt;
+    border-collapse: collapse;
+    background: rgba(46, 90, 58, 0.03);
+}
+
+.ms-credits-table th {
+    text-align: left;
+    font-weight: bold;
+    color: var(--kcs-green);
+    border-bottom: 1px solid var(--kcs-green);
+    padding: 3px 6px;
+    font-size: 8.5pt;
+}
+
+.ms-credits-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.ms-credits-table tbody tr:last-child td {
+    border-bottom: 2px solid var(--kcs-green);
+}
+
+/* Grade Columns Layout */
+.grade-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start; /* Align columns to the top */
+}
+
+.grade-column {
+    display: flex;
+    flex-direction: column;
+    break-inside: avoid;
+}
+
+.courses-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.year-awards {
+    font-size: 8pt;
+    padding: 6px 8px;
+    margin-top: 8px;
+    background: rgba(46, 90, 58, 0.06);
+    border-left: 2px solid var(--kcs-gold);
+    line-height: 1.4;
+    font-style: italic;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    min-height: 32px;
+}
+
+.year-awards strong {
+    color: var(--text-primary);
+    font-style: normal;
+    font-weight: 600;
+}
+
+/* Main Transcript Table */
+.transcript-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    border-bottom: 3px solid var(--kcs-green);
+}
+
+.transcript-table thead th {
+    text-align: left;
+    font-size: 8pt;
+    font-weight: bold;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--text-primary);
+    padding: 4px 6px;
+    background-color: #F0F0F0;
+}
+
+.transcript-table tbody td {
+    padding: 4px 6px;
+    font-size: 9px;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.transcript-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Column Widths */
+.transcript-table th:nth-child(1),
+.transcript-table td:nth-child(1) {
+    width: 62%;
+}
+
+.transcript-table th:nth-child(2),
+.transcript-table td:nth-child(2),
+.transcript-table th:nth-child(3),
+.transcript-table td:nth-child(3) {
+    width: 11%;
+    text-align: center;
+}
+
+.transcript-table th:nth-child(4),
+.transcript-table td:nth-child(4) {
+    width: 10%;
+    text-align: center;
+}
+
+.course-name {
+    font-weight: normal;
+}
+
+.course-name.core {
+    font-weight: bold;
+}
+
+.grade {
+    text-align: center;
+    font-weight: bold;
+}
+
+.credit {
+    text-align: center;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    font-size: 6.5pt;
+    font-weight: bold;
+    padding: 1px 4px;
+    margin-right: 4px;
+    border: 1px solid var(--kcs-green);
+    color: var(--kcs-green);
+    border-radius: 2px;
+    background: transparent;
+}
+
+.badge.badge-de {
+    color: var(--kcs-dark-blue);
+    border-color: var(--kcs-dark-blue);
+}
+
+.de-code {
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 8px;
+}
+
+/* Lower Section on Page 2 */
+.lower-section-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.simple-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+}
+
+.simple-table th, .simple-table td {
+    padding: 3px 5px;
+    text-align: left;
+    border-bottom: 1px solid #E0E0E0;
+}
+
+.simple-table th {
+    font-weight: bold;
+    background-color: #f7f7f7;
+}
+
+.simple-table tr:last-child td {
+    border-bottom: none;
+}
+
+.ap-table th:nth-child(n+3), .ap-table td:nth-child(n+3) {
+    text-align: center;
+}
+
+/* Page 1 Old Footer Styles (if needed for page 1) */
+.page1-footer {
+    position: absolute;
+    bottom: 0.5in;
+    left: 0.6in;
+    right: 0.6in;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+    font-size: 8pt;
+    color: var(--text-secondary);
+}
+
+.signature-area {
+    display: flex;
+    gap: 30px;
+}
+
+.signature-text {
+    text-align: center;
+}
+
+.seal-area {
+    /* Removed border - was creating "ugly gold square" */
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge-de {
+    border-color: var(--kcs-gold);
+    color: var(--kcs-gold);
+}
+
+/* Transfer Divider Rows */
+.transfer-divider td {
+    text-align: center;
+    font-style: italic;
+    color: var(--text-secondary);
+    padding: 8px 6px;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    background: transparent;
+    font-size: 8.5pt;
+}
+
+/* Bottom Section */
+.bottom-section {
+    margin-top: 18px;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+}
+
+.bottom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+/* 3-Column Bottom Grid (Page 2) */
+.bottom-grid-three {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+.bottom-grid-four {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.info-box {
+    background: transparent;
+}
+
+/* AP Scores Table - Compact display for up to 14 exams */
+.ap-table {
+    font-size: 7.5pt;
+    line-height: 1.3;
+}
+
+.ap-table td {
+    padding: 2px 4px;
+}
+
+.ap-table td:first-child {
+    text-align: left;
+    width: 75%;
+}
+
+.ap-table td:last-child {
+    text-align: center;
+    width: 25%;
+    font-weight: bold;
+}
+
+/* Award Lists */.simple-table td:last-child {
+    text-align: right;
+    color: var(--kcs-green);
+    font-weight: bold;
+    width: 30%;
+}
+
+.scale-note {
+    font-size: 7.5pt;
+    color: var(--text-secondary);
+    margin-top: 5px;
+    line-height: 1.4;
+}
+
+.no-data {
+    font-size: 8pt;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Awards List (deprecated - use recognition-list) */
+.awards-list {
+    list-style: none;
+    padding: 0;
+    font-size: 8.5pt;
+}
+
+.awards-list li {
+    padding: 3px 0;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.awards-list li:last-child {
+    border-bottom: none;
+}
+
+/* Recognitions Box on Final Page */
+.recognitions-box {
+    grid-column: span 2;  /* Takes up 2 columns in bottom-grid */
+}
+
+.recognition-category {
+    margin-bottom: 8px;
+}
+
+.recognition-subtitle {
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: var(--kcs-gold);
+    margin: 4px 0 2px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.recognition-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    font-size: 8pt;
+}
+
+.recognition-list li {
+    padding: 2px 0 2px 12px;
+    position: relative;
+}
+
+.recognition-list li:before {
+    content: '•';
+    color: var(--kcs-green);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* Flat Recognition List (No Sub-Headers) */
+.recognition-list-flat {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    font-size: 8pt;
+}
+
+.recognition-list-flat li {
+    padding: 2px 0 2px 12px;
+    position: relative;
+}
+
+.recognition-list-flat li:before {
+    content: '•';
+    color: var(--kcs-green);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* Footer with School Contact */
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 10px;
+    border-top: 2px solid var(--kcs-green);
+    font-size: 8pt;
+    background: transparent;
+    z-index: 1;
+}
+
+/* Page 2 Footer - Professional signature layout */
+.page2-footer {
+    position: absolute;
+    bottom: 0.5in;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: transparent;
+    z-index: 1;
+    padding-top: 12px;
+    border-top: 2px solid var(--kcs-green); /* Long green boundary line */
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+}
+
+.footer-signature-box {
+    flex: 1;
+    max-width: 280px;
+    min-width: 240px;
+}
+
+.footer-left {
+    text-align: left;
+}
+
+.footer-right {
+    text-align: right;
+}
+
+.signature-line {
+    border-bottom: 1.5px solid #333;
+    width: 100%;
+    height: 85px; /* Increased for larger signatures */
+    margin-bottom: 2px; /* Very close to line */
+    position: relative;
+    overflow: visible;
+}
+
+.signature-image {
+    position: absolute;
+    bottom: -18px; /* Much closer - signature strokes will touch line */
+    width: 100%;
+    height: auto;
+    max-height: 140px; /* Much larger - looking at signature strokes not PNG boundary */
+    object-fit: contain;
+}
+
+.signature-left {
+    left: 0;
+    object-position: left bottom;
+}
+
+.signature-right {
+    right: 0;
+    object-position: right bottom;
+}
+
+.signatory-name {
+    margin: 0;
+    font-size: 9px;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.signatory-title {
+    margin: 0;
+    font-size: 8px;
+    color: var(--text-secondary);
+}
+
+.footer-logos {
+    flex: 0 0 auto;
+    width: 300px; /* Increased from 280px for larger logos */
+    text-align: center;
+    position: relative;
+}
+
+.logo-arrangement {
+    position: relative;
+    height: 100px; /* Increased from 80px */
+    width: 100%;
+}
+
+.accreditation-logo {
+    position: absolute;
+}
+
+.logo-cognia {
+    left: 15px;
+    top: -5px;
+    height: 80px; /* Increased ~38% (was 58px) */
+    width: auto;
+    z-index: 10; /* Layer on top of ACSI */
+}
+
+.logo-acsi {
+    left: 50%;
+    top: 26px; /* Moved down a full quarter inch (18pt = 0.25in) */
+    transform: translateX(-50%);
+    height: 85px; /* Increased ~31% (was 65px) */
+    width: auto;
+    z-index: 1; /* Behind the circular seals */
+    /* Note: White background will be behind Cognia and AP Gold seals */
+}
+
+.logo-ap-gold {
+    right: 15px;
+    top: -5px;
+    height: 80px; /* Increased ~38% (was 58px) */
+    width: auto;
+    z-index: 10; /* Layer on top of ACSI */
+}
+
+.issue-date {
+    position: absolute;
+    bottom: -50px; /* Moved down quarter inch more (was -35px) */
+    left: 0;
+    right: 0;
+    margin: 0;
+    font-size: 9px; /* Increased from 7px - larger text */
+    color: #666;
+    text-align: center;
+}
+
+.footer-header {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.footer-school-name {
+    font-weight: bold;
+    font-size: 9pt;
+    color: var(--kcs-green);
+    margin: 0 0 3px 0;
+}
+
+.footer-contact {
+    font-size: 7.5pt;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.footer-signature {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.footer-left p,
+.footer-right p {
+    margin: 2px 0;
+}
+
+.verification {
+    font-size: 7.5pt;
+    color: var(--text-secondary);
+}
+
+/* Standardized Testing Blocks - Page 2 Bottom Section */
+.testing-blocks-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    margin-top: 24px;
+    margin-bottom: 100px; /* Space for footer */
+    page-break-inside: avoid;
+}
+
+/* Adjust grid when only 2 columns showing */
+.testing-blocks-container:has(> .testing-block:nth-child(2):last-child) {
+    grid-template-columns: 1fr 1fr;
+}
+
+/* Adjust grid when only 1 column showing */
+.testing-blocks-container:has(> .testing-block:first-child:last-child) {
+    grid-template-columns: 1fr;
+}
+
+.testing-block {
+    margin: 0;
+    padding: 12px;
+    border: 1px solid #333;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.testing-block .section-title-minor {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.testing-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.test-name {
+    margin: 0 0 5px 0;
+    font-size: 10px;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.test-scores {
+    font-size: 9px;
+    line-height: 1.6;
+}
+
+.test-scores p {
+    margin: 4px 0;
+}
+
+/* Enhanced SAT Block - Compact layout with inline composite */
+.sat-content {
+    justify-content: center;
+    padding: 6px 8px;
+}
+
+.test-name-large {
+    margin: 0 0 10px 0;
+    font-size: 10.5px;
+    font-weight: bold;
+    color: var(--text-primary);
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+
+.test-scores-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.sat-composite-inline {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 2px solid var(--kcs-green);
+}
+
+.sat-label-inline {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--text-secondary);
+}
+
+.sat-value-inline {
+    font-size: 18px; /* Inline with label, moderately sized */
+    font-weight: bold;
+    color: var(--kcs-green);
+}
+
+.sat-breakdown-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 2px 5px;
+}
+
+.sat-subscore-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.sat-subscore-compact:last-child {
+    border-bottom: none;
+}
+
+.sat-sublabel {
+    font-size: 9px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.sat-subvalue {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--kcs-dark-blue);
+    min-width: 40px;
+    text-align: right;
+}
+
+/* AP Scores Table */
+.ap-scores-table {
+    width: 100%;
+    font-size: 9px;
+    border-collapse: collapse;
+}
+
+.ap-scores-table thead tr {
+    border-bottom: 1px solid #ccc;
+}
+
+.ap-scores-table th {
+    text-align: left;
+    padding: 3px;
+    font-weight: bold;
+}
+
+.ap-scores-table th:nth-child(2),
+.ap-scores-table th:nth-child(3) {
+    text-align: center;
+}
+
+.ap-scores-table td {
+    padding: 3px;
+    font-size: 8px;
+}
+
+.ap-scores-table td:nth-child(2),
+.ap-scores-table td:nth-child(3) {
+    text-align: center;
+}
+
+.ap-credits-info {
+    margin-top: 8px;
+}
+
+.ap-credits {
+    font-size: 8px;
+    margin: 2px 0;
+    font-style: italic;
+}
+
+.ap-awards {
+    font-size: 8px;
+    margin: 2px 0;
+    font-weight: bold;
+}
+
+/* Grade Scale Block - Larger to match SAT block */
+.grade-scale-block .section-title-minor {
+    font-size: 11px; /* Slightly smaller to fit "Keswick Grade Scale" */
+}
+
+.grade-scale-content {
+    justify-content: center;
+    padding: 8px 5px;
+}
+
+/* Grade Scale Table */
+.grade-scale-table {
+    width: 100%;
+    font-size: 10px; /* Increased from 9px */
+    border-collapse: collapse;
+}
+
+.grade-scale-table thead tr {
+    border-bottom: 1px solid #ccc;
+}
+
+.grade-scale-table th {
+    padding: 4px 3px; /* Increased padding */
+    font-weight: bold;
+    font-size: 10px; /* Larger headers */
+}
+
+.grade-scale-table th:first-child {
+    text-align: left;
+}
+
+.grade-scale-table th:not(:first-child) {
+    text-align: center;
+}
+
+.grade-scale-table td {
+    padding: 4px 3px; /* Increased padding for better spacing */
+    font-size: 10px; /* Larger text */
+}
+
+.grade-scale-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+}
+
+.grade-scale-table td:not(:first-child) {
+    text-align: center;
+}
+
+
+/* Print Optimization */
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .page {
+        width: 100%;
+        max-width: none;
+    }
+}

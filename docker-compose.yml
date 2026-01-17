@@ -1,0 +1,95 @@
+# Docker Compose for Transcript Builder Development
+# Usage: docker-compose up -d
+
+version: '3.8'
+
+services:
+  # =============================================================================
+  # API SERVICE
+  # =============================================================================
+  api:
+    build:
+      context: .
+      target: development
+    container_name: transcript-builder-api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/transcript_builder
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - API_RELOAD=true
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+      - ./output:/app/output
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - transcript-network
+
+  # =============================================================================
+  # POSTGRESQL DATABASE
+  # =============================================================================
+  db:
+    image: postgres:15-alpine
+    container_name: transcript-builder-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=transcript_builder
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - transcript-network
+
+  # =============================================================================
+  # REDIS (for caching and background jobs)
+  # =============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: transcript-builder-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - transcript-network
+
+  # =============================================================================
+  # PGADMIN (optional - database management UI)
+  # =============================================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: transcript-builder-pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@local.dev
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - transcript-network
+    profiles:
+      - tools
+
+networks:
+  transcript-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

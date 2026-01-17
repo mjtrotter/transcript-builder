@@ -1,20 +1,20 @@
-# {{PROJECT_NAME}}
+# Transcript Builder
 
 ## Stack
-- Language: {{LANGUAGE}}
-- Framework: {{FRAMEWORK}}
-- Database: {{DATABASE}}
-- Test: `{{TEST_COMMAND}}`
-- Build: `{{BUILD_COMMAND}}`
+- Language: Python
+- Framework: Jinja2 (templating), WeasyPrint (PDF)
+- Database: SQLite (student data)
+- Test: `pytest tests/`
+- Build: `python -m build`
 
 ## Coding Rules
-- Type hints required (Python) or TypeScript types (JS/TS)
+- Type hints required for all functions
 - No hardcoded paths or credentials
-- Error handling for all external calls
-- Follow existing patterns in codebase
+- Error handling for all file/data operations
+- Follow existing patterns in src/
 
 ## Test Policy
-- Run tests before commit: `{{TEST_COMMAND}}`
+- Run tests before commit: `pytest tests/`
 - Coverage target: 80%
 - TDD for new features: write tests first
 
@@ -24,8 +24,8 @@
 - Planning and architecture decisions
 - Updating documentation (READMEs, STATUS.md)
 - Code review and final approval
-- Context-sensitive debugging
-- Iterative test-fix loops
+- Template debugging (HTML/CSS)
+- GPA calculation logic review
 
 **Delegate to executors:**
 - Code generation (>20 lines) → use `delegate_code` tool
@@ -65,4 +65,10 @@ Update READMEs when adding/modifying files.
 Clean up scratchpad at session end.
 
 ## Project Notes
-{{PROJECT_NOTES}}
+
+This system generates academic transcripts from student data:
+- Input: CSV/Excel student records, course data
+- Output: HTML/PDF transcripts
+- Key modules: `src/data_processor.py`, `src/gpa_calculator.py`, `src/transcript_generator.py`
+- Templates in `templates/` (Jinja2 HTML)
+- Watch for GPA precision issues (use Decimal, not float)

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Official Transcript - {{ student['First name'] }} {{ student['Last name'] }}</title>
+    <link rel="stylesheet" href="styles_minimalist.css">
+    <style>
+        /* Dynamic row height balancing for paired grades */
+            {
+            % if courses_by_grade.get('9') and courses_by_grade.get('10') %
+        }
+
+            {
+            % set grade9_count=courses_by_grade['9']|selectattr('is_divider', 'undefined')|list|length %
+        }
+
+            {
+            % set grade10_count=courses_by_grade['10']|selectattr('is_divider', 'undefined')|list|length %
+        }
+
+            {
+            % set max_count_910=[grade9_count,
+            grade10_count]|max %
+        }
+
+        .page:nth-of-type(1) .grade-9-10-pair:nth-of-type(1) .transcript-table tbody tr:not(.transfer-divider) {
+            flex: {
+                    {
+                    max_count_910 / grade9_count if grade9_count>0 else 1
+                }
+            }
+
+            ;
+        }
+
+        .page:nth-of-type(1) .grade-9-10-pair:nth-of-type(2) .transcript-table tbody tr:not(.transfer-divider) {
+            flex: {
+                    {
+                    max_count_910 / grade10_count if grade10_count>0 else 1
+                }
+            }
+
+            ;
+        }
+
+            {
+            % endif %
+        }
+
+            {
+            % if courses_by_grade.get('11') and courses_by_grade.get('12') %
+        }
+
+            {
+            % set grade11_count=courses_by_grade['11']|selectattr('is_divider', 'undefined')|list|length %
+        }
+
+            {
+            % set grade12_count=courses_by_grade['12']|selectattr('is_divider', 'undefined')|list|length %
+        }
+
+            {
+            % set max_count_1112=[grade11_count,
+            grade12_count]|max %
+        }
+
+        .page:nth-of-type(2) .grade-11-12-pair:nth-of-type(1) .transcript-table tbody tr:not(.transfer-divider) {
+            flex: {
+                    {
+                    max_count_1112 / grade11_count if grade11_count>0 else 1
+                }
+            }
+
+            ;
+        }
+
+        .page:nth-of-type(2) .grade-11-12-pair:nth-of-type(2) .transcript-table tbody tr:not(.transfer-divider) {
+            flex: {
+                    {
+                    max_count_1112 / grade12_count if grade12_count>0 else 1
+                }
+            }
+
+            ;
+        }
+
+            {
+            % endif %
+        }
+    </style>
+</head>
+
+<body class="spacing-{{ spacing_tier }}">
+    <!-- PAGE 1 -->
+    <div class="page">
+        <div class="watermark"></div>
+
+        <!-- Redesigned Header - Larger Logo, Current Grade Level -->
+        <header class="header">
+            <div class="header-left">
+                <div>
+                    <img src="{{ school_logo_path }}" alt="KCS Logo" class="logo">
+                    <div class="school-address">
+                        <p class="school-address-line">10101 54th Avenue North</p>
+                        <p class="school-address-line">St Petersburg, FL 33708</p>
+                        <p class="school-address-line">(727)-393-9100</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-center">
+                <h1 class="title-word">OFFICIAL</h1>
+                <h1 class="title-word">TRANSCRIPT</h1>
+            </div>
+
+            <div class="header-right">
+                <p class="student-name">{{ student['First name'] }} {{ student['Last name'] }}</p>
+                {% if student.get('Home address') and student['Home address'] is string %}
+                {% set address_lines = student['Home address'].split('\n') %}
+                <p class="student-detail-address">{{ address_lines[0] }}</p>
+                {% if address_lines|length > 1 %}
+                <p class="student-detail-address">{{ address_lines[1].replace(' United States', '').strip() }}</p>
+                {% elif student.get('City') and student.get('State') %}
+                <p class="student-detail-address">{{ student['City'] }}, {{ student['State'] }}</p>
+                {% endif %}
+                {% elif student.get('City') and student.get('State') %}
+                <p class="student-detail-address">{{ student['City'] }}, {{ student['State'] }}</p>
+                {% endif %}
+                <div class="student-details-row">
+                    {% set dob_parts = student['Date of birth'].split('-') %}
+                    <p class="student-detail-item"><span class="detail-label">Date of Birth:</span> {{ dob_parts[1]
+                        }}/{{ dob_parts[2] }}/{{ dob_parts[0] }}</p>
+                    <p class="student-detail-item"><span class="detail-label">Anticipated Graduation:</span> {{
+                        student['Graduation year'] }}</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Summary Bar with 5 evenly spaced items -->
+        <div class="summary-bar">
+            <div class="summary-item">
+                <span class="label">Credits Earned</span>
+                <span class="value">{{ gpa.total_credits_earned }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Composite GPA</span>
+                <span class="value">{{ "%.2f"|format(gpa.weighted_gpa) if gpa.weighted_gpa else "—" }} ({{
+                    "%.2f"|format(gpa.unweighted_gpa) if gpa.unweighted_gpa else "—" }})</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">CORE GPA</span>
+                <span class="value">{{ "%.2f"|format(gpa.core_weighted_gpa) }} ({{
+                    "%.2f"|format(gpa.core_unweighted_gpa) }})</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Class Rank</span>
+                <span class="value">{{ class_rank.decile if class_rank else '—' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Service Hours</span>
+                <span class="value">{% set hours = student.get('Community Service Hours', '') %}{% if hours and
+                    hours|string not in ['nan', 'NaN', '', 'None', '0'] %}{% set hours_str = hours|string %}{% if '(' in
+                    hours_str and 'total)' in hours_str %}{{ hours_str.split('(')[1].split(' total)')[0] }}{% elif '
+                    hours' in hours_str %}{{ hours_str.replace(' hours', '') }}{% else %}{{ hours_str }}{% endif %}{%
+                    else %}—{% endif %}</span>
+            </div>
+        </div>
+
+        <!-- Academic Record -->
+        <section class="transcript-section academic-record-page1">
+            <h2 class="section-title">Academic Record</h2>
+
+            <!-- Early HS Credits -->
+            {% if middle_school_credits %}
+            <div class="ms-credits-section">
+                <h4 class="ms-credits-title">Early High School Credits</h4>
+                <table class="ms-credits-table">
+                    <thead>
+                        <tr>
+                            <th>Course</th>
+                            <th>Sem 1</th>
+                            <th>Sem 2</th>
+                            <th>Credit</th>
+                            <th>Grade Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in middle_school_credits %}
+                        <tr>
+                            <td>
+                                {% if (course.weight and course.weight.is_honors) or course.is_honors_detected or '(H)'
+                                in course.course_title or ' Honors' in course.course_title %}
+                                <span class="badge">H</span>{{ course.course_title.replace(' (H)',
+                                '').replace('(H)', '').replace(' Honors', '') }}
+                                {% else %}
+                                {{ course.course_title }}
+                                {% endif %}
+                            </td>
+                            <td>{{ course.sem1_grade }}</td>
+                            <td>{{ course.sem2_grade }}</td>
+                            <td>{{ course.credits }}</td>
+                            <td>{{ course.grade_level }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <div class="grade-columns">
+                <!-- 9th Grade -->
+                {% if courses_by_grade.get('9') %}
+                <div class="grade-column">
+                    <h3 class="grade-year">
+                        <span>{{ grade_metadata['9'].display_year if grade_metadata.get('9') else '' }} | 9th
+                            Grade</span>
+                        <span>{% if grade_metadata.get('9') and grade_metadata['9'].weighted_gpa > 0 %}TERM GPA: {{
+                            "%.2f"|format(grade_metadata['9'].weighted_gpa) }} ({{
+                            "%.2f"|format(grade_metadata['9'].unweighted_gpa) }}){% endif %}</span>
+                    </h3>
+                    <div class="courses-container">
+                        <table class="transcript-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Sem 1</th>
+                                    <th>Sem 2</th>
+                                    <th>Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses_by_grade['9'] %}
+                                {% if course.get('is_divider') %}
+                                <tr class="transfer-divider">
+                                    <td colspan="4">{{ course.divider_text }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td class="course-name{% if course.weight.core %} core{% endif %}">
+                                        {% if course.is_de %}<span class="badge badge-de">DE</span> {% elif
+                                        course.weight.is_ap %}<span class="badge badge-ap">AP</span> {% elif
+                                        course.weight.is_honors %}<span class="badge">H</span> {% endif %}{{
+                                        course.cleaned_title if course.cleaned_title else course.course_title }}{% if
+                                        course.de_code_sem1 or course.de_code_sem2 %} <span class="de-code">({% if
+                                            course.sem1_grade and course.de_code_sem1 %}{{ course.de_code_sem1 }}{% if
+                                            course.sem2_grade and course.de_code_sem2 and course.de_code_sem2 !=
+                                            course.de_code_sem1 %}/{{ course.de_code_sem2 }}{% endif %}{% elif
+                                            course.sem2_grade and course.de_code_sem2 %}{{ course.de_code_sem2 }}{%
+                                            endif %})</span>{% endif %}
+                                    </td>
+                                    <td class="grade">{{ course.sem1_grade or '—' }}</td>
+                                    <td class="grade">{{ course.sem2_grade or '—' }}</td>
+                                    <td class="credit">{{ course.credits }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% set display_year_9 = grade_metadata['9'].display_year if grade_metadata.get('9') else '' %}
+                    {% if display_year_9 and awards_by_year.get(display_year_9) and
+                    awards_by_year[display_year_9]|length > 0 %}
+                    <div class="year-awards">
+                        {% set filtered_awards = awards_by_year[display_year_9] %}
+                        <strong>Distinctions:</strong> {% for award in filtered_awards %}{{ award.award_name }}{% if
+                        award.semester %} ({{ award.semester }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor
+                        %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- 10th Grade -->
+                {% if courses_by_grade.get('10') %}
+                <div class="grade-column">
+                    <h3 class="grade-year">
+                        <span>{{ grade_metadata['10'].display_year if grade_metadata.get('10') else '' }} | 10th
+                            Grade</span>
+                        <span>{% if grade_metadata.get('10') and grade_metadata['10'].weighted_gpa > 0 %}TERM GPA: {{
+                            "%.2f"|format(grade_metadata['10'].weighted_gpa) }} ({{
+                            "%.2f"|format(grade_metadata['10'].unweighted_gpa) }}){% endif %}</span>
+                    </h3>
+                    <div class="courses-container">
+                        <table class="transcript-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Sem 1</th>
+                                    <th>Sem 2</th>
+                                    <th>Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for course in courses_by_grade['10'] %}
+                                {% if course.get('is_divider') %}
+                                <tr class="transfer-divider">
+                                    <td colspan="4">{{ course.divider_text }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td class="course-name{% if course.weight.core %} core{% endif %}">
+                                        {% if course.is_de %}<span class="badge badge-de">DE</span> {% elif
+                                        course.weight.is_ap %}<span class="badge badge-ap">AP</span> {% elif
+                                        course.weight.is_honors %}<span class="badge">H</span> {% endif %}{{
+                                        course.cleaned_title if course.cleaned_title else course.course_title }}{% if
+                                        course.de_code_sem1 or course.de_code_sem2 %} <span class="de-code">({% if
+                                            course.sem1_grade and course.de_code_sem1 %}{{ course.de_code_sem1 }}{% if
+                                            course.sem2_grade and course.de_code_sem2 and course.de_code_sem2 !=
+                                            course.de_code_sem1 %}/{{ course.de_code_sem2 }}{% endif %}{% elif
+                                            course.sem2_grade and course.de_code_sem2 %}{{ course.de_code_sem2 }}{%
+                                            endif %})</span>{% endif %}
+                                    </td>
+                                    <td class="grade">{{ course.sem1_grade or '—' }}</td>
+                                    <td class="grade">{{ course.sem2_grade or '—' }}</td>
+                                    <td class="credit">{{ course.credits }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% set display_year_10 = grade_metadata['10'].display_year if grade_metadata.get('10') else '' %}
+                    {% if display_year_10 and awards_by_year.get(display_year_10) and
+                    awards_by_year[display_year_10]|length > 0 %}
+                    <div class="year-awards">
+                        {% set filtered_awards = awards_by_year[display_year_10] %}
+                        <strong>Distinctions:</strong> {% for award in filtered_awards %}{{ award.award_name }}{% if
+                        award.semester %} ({{ award.semester }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor
+                        %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+        {% if single_page_layout %}
+        <footer class="page2-footer">
+            <div class="footer-container">
+                <div class="footer-signature-box footer-left">
+                    <div class="signature-line">
+                        {% if principal_signature_base64 %}
+                        <img src="data:image/png;base64,{{ principal_signature_base64 }}"
+                            class="signature-image signature-left" alt="Principal Signature">
+                        {% endif %}
+                    </div>
+                    <p class="signatory-name">Lee Mortimer</p>
+                    <p class="signatory-title">Upper School Principal</p>
+                </div>
+                <div class="footer-logos">
+                    <div class="logo-arrangement">
+                        {% if cognia_logo_base64 %}
+                        <img src="data:image/png;base64,{{ cognia_logo_base64 }}" class="accreditation-logo logo-cognia"
+                            alt="Cognia Accreditation">
+                        {% endif %}
+                        {% if acsi_logo_base64 %}
+                        <img src="data:image/jpeg;base64,{{ acsi_logo_base64 }}" class="accreditation-logo logo-acsi"
+                            alt="ACSI Accreditation">
+                        {% endif %}
+                        {% if ap_gold_logo_base64 %}
+                        <img src="data:image/png;base64,{{ ap_gold_logo_base64 }}"
+                            class="accreditation-logo logo-ap-gold" alt="AP Platinum Honor Roll">
+                        {% endif %}
+                    </div>
+                    <p class="issue-date">Issue Date: {{ issue_date }}</p>
+                </div>
+                <div class="footer-signature-box footer-right">
+                    <div class="signature-line">
+                        {% if guidance_signature_base64 %}
+                        <img src="data:image/png;base64,{{ guidance_signature_base64 }}"
+                            class="signature-image signature-right" alt="Guidance Director Signature">
+                        {% endif %}
+                    </div>
+                    <p class="signatory-name">Mark J Trotter</p>
+                    <p class="signatory-title">Upper School Guidance Director</p>
+                </div>
+            </div>
+        </footer>
+        {% endif %}
+    </div><!-- End Page 1 -->
+
+    <!-- PAGE 2 -->
+    {% if not single_page_layout %}
+    <div class="page">
+        <div class="watermark"></div>
+
+        <section class="transcript-section">
+            <div class="grade-columns">
+                <!-- 11th Grade -->
+                {% if courses_by_grade.get('11') or (current_grade == 11 and courses_in_progress and
+                courses_in_progress|length > 0) %}
+                <div class="grade-column">
+                    <h3 class="grade-year">
+                        <span>{{ grade_metadata['11'].display_year if grade_metadata.get('11') else '' }} | 11th
+                            Grade</span>
+                        <span>{% if grade_metadata.get('11') and grade_metadata['11'].weighted_gpa > 0 %}TERM GPA: {{
+                            "%.2f"|format(grade_metadata['11'].weighted_gpa) }} ({{
+                            "%.2f"|format(grade_metadata['11'].unweighted_gpa) }}){% endif %}</span>
+                    </h3>
+                    <div class="courses-container">
+                        <table class="transcript-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Sem 1</th>
+                                    <th>Sem 2</th>
+                                    <th>Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if courses_by_grade.get('11') %}
+                                {% for course in courses_by_grade['11'] %}
+                                {% if course.get('is_divider') %}
+                                <tr class="transfer-divider">
+                                    <td colspan="4">{{ course.divider_text }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td class="course-name{% if course.weight.core %} core{% endif %}">
+                                        {% if course.is_de %}<span class="badge badge-de">DE</span> {% elif
+                                        course.weight.is_ap %}<span class="badge badge-ap">AP</span> {% elif
+                                        course.weight.is_honors %}<span class="badge">H</span> {% endif %}{{
+                                        course.cleaned_title if course.cleaned_title else course.course_title }}{% if
+                                        course.de_code_sem1 or course.de_code_sem2 %} <span class="de-code">({% if
+                                            course.sem1_grade and course.de_code_sem1 %}{{ course.de_code_sem1 }}{% if
+                                            course.sem2_grade and course.de_code_sem2 and course.de_code_sem2 !=
+                                            course.de_code_sem1 %}/{{ course.de_code_sem2 }}{% endif %}{% elif
+                                            course.sem2_grade and course.de_code_sem2 %}{{ course.de_code_sem2 }}{%
+                                            endif %})</span>{% endif %}
+                                    </td>
+                                    <td class="grade">{{ course.sem1_grade or '—' }}</td>
+                                    <td class="grade">{{ course.sem2_grade or '—' }}</td>
+                                    <td class="credit">{{ course.credits }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+
+                                <!-- Courses in Progress (show in student's current grade block) -->
+                                {% if current_grade == 11 and courses_in_progress and courses_in_progress|length > 0 %}
+                                <tr class="transfer-divider">
+                                    <td colspan="4"
+                                        style="font-style: italic; background: #f5f5f5; text-align: left; padding-left: 8px;">
+                                        Courses in Progress</td>
+                                </tr>
+                                {% for course_ip in courses_in_progress %}
+                                <tr style="font-style: italic; opacity: 0.9;">
+                                    <td class="course-name">
+                                        {{ course_ip.title }}
+                                    </td>
+                                    <td class="grade">—</td>
+                                    <td class="grade">—</td>
+                                    <td class="credit">—</td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% set display_year_11 = grade_metadata['11'].display_year if grade_metadata.get('11') else '' %}
+                    {% if display_year_11 and awards_by_year.get(display_year_11) and
+                    awards_by_year[display_year_11]|length > 0 %}
+                    <div class="year-awards">
+                        {% set filtered_awards = awards_by_year[display_year_11] %}
+                        <strong>Distinctions:</strong> {% for award in filtered_awards %}{{ award.award_name }}{% if
+                        award.semester %} ({{ award.semester }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor
+                        %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- 12th Grade -->
+                {% if courses_by_grade.get('12') or (current_grade == 12 and courses_in_progress) %}
+                <div class="grade-column">
+                    <h3 class="grade-year">
+                        <span>{{ grade_metadata['12'].display_year if grade_metadata.get('12') else '' }} | 12th
+                            Grade</span>
+                        <span>{% if grade_metadata.get('12') and grade_metadata['12'].weighted_gpa > 0 %}TERM GPA: {{
+                            "%.2f"|format(grade_metadata['12'].weighted_gpa) }} ({{
+                            "%.2f"|format(grade_metadata['12'].unweighted_gpa) }}){% endif %}</span>
+                    </h3>
+                    <div class="courses-container">
+                        <table class="transcript-table">
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Sem 1</th>
+                                    <th>Sem 2</th>
+                                    <th>Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if courses_by_grade.get('12') %}
+                                {% for course in courses_by_grade['12'] %}
+                                {% if course.get('is_divider') %}
+                                <tr class="transfer-divider">
+                                    <td colspan="4">{{ course.divider_text }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td class="course-name{% if course.weight.core %} core{% endif %}">
+                                        {% if course.is_de %}<span class="badge badge-de">DE</span> {% elif
+                                        course.weight.is_ap %}<span class="badge badge-ap">AP</span> {% elif
+                                        course.weight.is_honors %}<span class="badge">H</span> {% endif %}{{
+                                        course.cleaned_title if course.cleaned_title else course.course_title }}{% if
+                                        course.de_code_sem1 or course.de_code_sem2 %} <span class="de-code">({% if
+                                            course.sem1_grade and course.de_code_sem1 %}{{ course.de_code_sem1 }}{% if
+                                            course.sem2_grade and course.de_code_sem2 and course.de_code_sem2 !=
+                                            course.de_code_sem1 %}/{{ course.de_code_sem2 }}{% endif %}{% elif
+                                            course.sem2_grade and course.de_code_sem2 %}{{ course.de_code_sem2 }}{%
+                                            endif %})</span>{% endif %}
+                                    </td>
+                                    <td class="grade">{{ course.sem1_grade or '—' }}</td>
+                                    <td class="grade">{{ course.sem2_grade or '—' }}</td>
+                                    <td class="credit">{{ course.credits }}</td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                                {% endif %}
+
+                                <!-- Courses in Progress (only for 12th grade current students) -->
+                                {% if current_grade == 12 and courses_in_progress %}
+                                <tr class="transfer-divider">
+                                    <td colspan="4"
+                                        style="font-style: italic; background: #f5f5f5; text-align: left; padding-left: 8px;">
+                                        Courses in Progress</td>
+                                </tr>
+                                {% for course_ip in courses_in_progress %}
+                                <tr style="font-style: italic; opacity: 0.9;">
+                                    <td class="course-name">
+                                        {{ course_ip.title }}
+                                    </td>
+                                    <td class="grade">—</td>
+                                    <td class="grade">—</td>
+                                    <td class="credit">—</td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% set display_year_12 = grade_metadata['12'].display_year if grade_metadata.get('12') else '' %}
+                    {% if display_year_12 and awards_by_year.get(display_year_12) and
+                    awards_by_year[display_year_12]|length > 0 %}
+                    <div class="year-awards">
+                        {% set filtered_awards = awards_by_year[display_year_12] %}
+                        <strong>Distinctions:</strong> {% for award in filtered_awards %}{{ award.award_name }}{% if
+                        award.semester %} ({{ award.semester }}){% endif %}{% if not loop.last %}; {% endif %}{% endfor
+                        %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Three Column Bottom Section: SAT | AP Scores | Grade Scale (Responsive) -->
+        {% set show_sat = test_scores.sat and test_scores.sat.total >= 1000 %}
+        {% set qualifying_ap_scores = [] %}
+        {% if ap_scores %}
+        {% for exam in ap_scores %}
+        {% if exam.score >= 3 %}
+        {% set _ = qualifying_ap_scores.append(exam) %}
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+
+        {% set show_ap = qualifying_ap_scores|length > 0 %}
+        {% set num_columns = (1 if show_sat else 0) + (1 if show_ap else 0) + 1 %}
+        {% set grid_columns = '1fr 1fr 1fr' if num_columns == 3 else ('1fr 1fr' if num_columns == 2 else '1fr') %}
+
+        <div class="testing-blocks-container">
+
+            <!-- Column 1: Standardized Testing (conditional) -->
+            {% if show_sat %}
+            <section class="testing-block sat-block">
+                <h3 class="section-title-minor">Standardized Testing</h3>
+                <div class="testing-content sat-content">
+                    <h4 class="test-name-large">Scholastic Aptitude Test (SAT)</h4>
+                    <div class="test-scores-compact">
+                        <div class="sat-composite-inline">
+                            <span class="sat-label-inline">Composite:</span>
+                            <span class="sat-value-inline">{{ test_scores.sat.total }}</span>
+                        </div>
+                        <div class="sat-breakdown-compact">
+                            <div class="sat-subscore-compact">
+                                <span class="sat-sublabel">Evidence-Based Reading & Writing</span>
+                                <span class="sat-subvalue">{{ test_scores.sat.erw }}</span>
+                            </div>
+                            <div class="sat-subscore-compact">
+                                <span class="sat-sublabel">Mathematics</span>
+                                <span class="sat-subvalue">{{ test_scores.sat.math }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Column 2: AP Exam Scores (conditional, only scores >= 3) -->
+            {% if show_ap %}
+            <section class="testing-block">
+                <h3 class="section-title-minor">AP Exam Scores</h3>
+                <div class="testing-content">
+                    <table class="ap-scores-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Score</th>
+                                <th>Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in qualifying_ap_scores %}
+                            <tr>
+                                <td>{{ exam.subject }}</td>
+                                <td>{{ exam.score }}</td>
+                                <td>{{ exam.year }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="ap-credits-info">
+                        {% if ap_college_credits > 0 %}
+                        <p class="ap-credits">Est. College Credits: {{ ap_college_credits }}</p>
+                        {% endif %}
+                        {% if ap_awards and ap_awards|length > 0 %}
+                        <p class="ap-awards">{% for award in ap_awards %}{{ award.type }}{% if award.year %} ({{
+                            award.year }}){% endif %}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Column 3: Grade Translation Scale (always shown) -->
+            <section class="testing-block grade-scale-block">
+                <h3 class="section-title-minor">Keswick Grade Scale</h3>
+                <div class="testing-content grade-scale-content">
+                    <table class="grade-scale-table">
+                        <thead>
+                            <tr>
+                                <th>Letter</th>
+                                <th>Range</th>
+                                <th>Std</th>
+                                <th>H</th>
+                                <th>AP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A</td>
+                                <td>89.5-100</td>
+                                <td>4.0</td>
+                                <td>4.5</td>
+                                <td>5.0</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>79.5-89.4</td>
+                                <td>3.0</td>
+                                <td>3.5</td>
+                                <td>4.0</td>
+                            </tr>
+                            <tr>
+                                <td>C</td>
+                                <td>69.5-79.4</td>
+                                <td>2.0</td>
+                                <td>2.5</td>
+                                <td>3.0</td>
+                            </tr>
+                            <tr>
+                                <td>D</td>
+                                <td>59.5-69.4</td>
+                                <td>1.0</td>
+                                <td>1.0</td>
+                                <td>1.0</td>
+                            </tr>
+                            <tr>
+                                <td>F</td>
+                                <td>&lt;59.5</td>
+                                <td>0.0</td>
+                                <td>0.0</td>
+                                <td>0.0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer class="page2-footer">
+            <div class="footer-container">
+                <!-- Left: Upper School Principal -->
+                <div class="footer-signature-box footer-left">
+                    <div class="signature-line">
+                        {% if principal_signature_base64 %}
+                        <img src="data:image/png;base64,{{ principal_signature_base64 }}"
+                            class="signature-image signature-left" alt="Principal Signature">
+                        {% endif %}
+                    </div>
+                    <p class="signatory-name">Lee Mortimer</p>
+                    <p class="signatory-title">Upper School Principal</p>
+                </div>
+
+                <!-- Center: Accreditation Logos -->
+                <div class="footer-logos">
+                    <div class="logo-arrangement">
+                        <!-- Cognia (left, higher) -->
+                        {% if cognia_logo_base64 %}
+                        <img src="data:image/png;base64,{{ cognia_logo_base64 }}" class="accreditation-logo logo-cognia"
+                            alt="Cognia Accreditation">
+                        {% endif %}
+
+                        <!-- ACSI (center, shifted down) -->
+                        {% if acsi_logo_base64 %}
+                        <img src="data:image/jpeg;base64,{{ acsi_logo_base64 }}" class="accreditation-logo logo-acsi"
+                            alt="ACSI Accreditation">
+                        {% endif %}
+
+                        <!-- AP Gold (right, level with Cognia) -->
+                        {% if ap_gold_logo_base64 %}
+                        <img src="data:image/png;base64,{{ ap_gold_logo_base64 }}"
+                            class="accreditation-logo logo-ap-gold" alt="AP Platinum Honor Roll">
+                        {% endif %}
+                    </div>
+                    <p class="issue-date">Issue Date: {{ issue_date }}</p>
+                </div>
+
+                <!-- Right: Upper School Guidance Director -->
+                <div class="footer-signature-box footer-right">
+                    <div class="signature-line">
+                        {% if guidance_signature_base64 %}
+                        <img src="data:image/png;base64,{{ guidance_signature_base64 }}"
+                            class="signature-image signature-right" alt="Guidance Director Signature">
+                        {% endif %}
+                    </div>
+                    <p class="signatory-name">Mark J Trotter</p>
+                    <p class="signatory-title">Upper School Guidance Director</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    {% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            function alignGradeColumns(gradeClass1, gradeClass2) {
+                const grade1 = document.querySelector(gradeClass1);
+                const grade2 = document.querySelector(gradeClass2);
+
+                if (grade1 && grade2) {
+                    const container1 = grade1.querySelector('.courses-container');
+                    const container2 = grade2.querySelector('.courses-container');
+
+                    if (container1 && container2) {
+                        // Reset heights to auto to measure natural height
+                        container1.style.height = 'auto';
+                        container2.style.height = 'auto';
+
+                        // Defer measurement to allow for rendering
+                        setTimeout(() => {
+                            const height1 = container1.scrollHeight;
+                            const height2 = container2.scrollHeight;
+                            const maxHeight = Math.max(height1, height2);
+
+                            container1.style.height = `${maxHeight}px`;
+                            container2.style.height = `${maxHeight}px`;
+                        }, 0);
+                    }
+                }
+            }
+
+            // Align 9th and 10th grade columns on Page 1
+            alignGradeColumns('.grade-column:nth-of-type(1)', '.grade-column:nth-of-type(2)');
+
+            // Align 11th and 12th grade columns on Page 2
+            // Note: These selectors assume they are the first two columns on the second page.
+            const page2Columns = document.querySelectorAll('.page:nth-of-type(2) .grade-column');
+            if (page2Columns.length >= 2) {
+                const container1 = page2Columns[0].querySelector('.courses-container');
+                const container2 = page2Columns[1].querySelector('.courses-container');
+
+                if (container1 && container2) {
+                    // Reset heights to auto to measure natural height
+                    container1.style.height = 'auto';
+                    container2.style.height = 'auto';
+
+                    // Defer measurement to allow for rendering
+                    setTimeout(() => {
+                        const height1 = container1.scrollHeight;
+                        const height2 = container2.scrollHeight;
+                        const maxHeight = Math.max(height1, height2);
+
+                        container1.style.height = `${maxHeight}px`;
+                        container2.style.height = `${maxHeight}px`;
+                    }, 0);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

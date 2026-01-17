@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+*.egg-info/
+
+# Output
+output/
+*.log
+debug_output.txt
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+_scratch/*.md
+!_scratch/README.md
+.claude/delegation_quota.json
+
+# Data (large files)
+data/*.csv
+data/*.xlsx
+!data/README.md

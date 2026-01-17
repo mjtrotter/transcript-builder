@@ -1,32 +1,36 @@
-# {{PROJECT_NAME}}
+# Transcript Builder
 
-> {{PROJECT_DESCRIPTION}}
+> Student transcript generation system - creates academic transcripts from student data.
 
 ## Quick Start
 
 ```bash
 # Install dependencies
-{{INSTALL_COMMAND}}
+pip install -e .
 
 # Run tests
-{{TEST_COMMAND}}
+pytest tests/
 
-# Start development
-{{DEV_COMMAND}}
+# Generate a transcript
+python generate_transcript.py --student-id 12345
 ```
 
 ## Project Structure
 
 ```
-{{PROJECT_NAME}}/
+transcript-builder/
 ├── .claude/              # AI orchestration config
 │   ├── settings.json     # MCP servers and tools
 │   ├── delegation/       # Delegation toolkit
 │   └── skills/           # Reusable skills (TDD, debug, etc.)
 ├── src/                  # Source code
+│   ├── data_processor.py # Load and process student data
+│   ├── gpa_calculator.py # GPA calculation logic
+│   └── transcript_generator.py # Generate HTML/PDF output
+├── templates/            # Jinja2 HTML templates
+├── data/                 # Student data files
 ├── tests/                # Test files
 ├── planning/             # Project status and session logs
-├── research/             # Research queries and results (if needed)
 └── _scratch/             # Ephemeral session coordination
 ```
 
@@ -49,6 +53,14 @@ This project uses the Delegation Toolkit for AI-assisted development:
 
 See `CLAUDE.md` for detailed delegation rules.
 
+## Key Features
+
+- CSV/Excel data import
+- GPA calculation (weighted, unweighted)
+- HTML transcript generation
+- PDF export via WeasyPrint
+- Batch processing support
+
 ## License
 
-{{LICENSE}}
+MIT
