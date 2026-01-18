@@ -15,9 +15,19 @@ from pathlib import Path
 from typing import Optional
 import json
 import os
+import sys
 
-from .executors import JulesExecutor, GeminiExecutor, QwenExecutor, PerplexityExecutor
-from .quota import QuotaManager
+# Handle both package and standalone execution
+_this_dir = Path(__file__).parent
+if str(_this_dir) not in sys.path:
+    sys.path.insert(0, str(_this_dir))
+
+try:
+    from executors import JulesExecutor, GeminiExecutor, QwenExecutor, PerplexityExecutor
+    from quota import QuotaManager
+except ImportError:
+    from .executors import JulesExecutor, GeminiExecutor, QwenExecutor, PerplexityExecutor
+    from .quota import QuotaManager
 
 mcp = FastMCP(
     name="delegation-toolkit",
