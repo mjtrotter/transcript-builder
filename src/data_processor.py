@@ -1383,10 +1383,20 @@ class TranscriptDataProcessor:
             full_time_count += 1
 
             try:
-                # Calculate cumulative GPA using merged calculator
-                cum_weighted = gpa_calc.calculate_cumulative_gpa(user_id, weighted=True)
-                cum_unweighted = gpa_calc.calculate_cumulative_gpa(
-                    user_id, weighted=False
+                # Calculate CORE GPA (only CORE courses)
+                core_weighted = gpa_calc.calculate_cumulative_gpa(
+                    user_id, weighted=True, core_only=True
+                )
+                core_unweighted = gpa_calc.calculate_cumulative_gpa(
+                    user_id, weighted=False, core_only=True
+                )
+
+                # Calculate COMPOSITE GPA (ALL courses)
+                composite_weighted = gpa_calc.calculate_cumulative_gpa(
+                    user_id, weighted=True, core_only=False
+                )
+                composite_unweighted = gpa_calc.calculate_cumulative_gpa(
+                    user_id, weighted=False, core_only=False
                 )
 
                 # Count course types for this student
@@ -1408,14 +1418,16 @@ class TranscriptDataProcessor:
                     from data_models import GPACalculation
 
                 # Store GPA result with correct field names
+                # weighted_gpa/unweighted_gpa = COMPOSITE (all courses)
+                # core_weighted_gpa/core_unweighted_gpa = CORE only
                 gpa_result = GPACalculation(
                     student_id=user_id,
-                    weighted_gpa=cum_weighted["gpa"],
-                    unweighted_gpa=cum_unweighted["gpa"],
-                    core_weighted_gpa=cum_weighted["gpa"],
-                    core_unweighted_gpa=cum_unweighted["gpa"],
-                    total_credits_attempted=cum_weighted["credits_attempted"],
-                    total_credits_earned=cum_weighted["credits_earned"],
+                    weighted_gpa=composite_weighted["gpa"],
+                    unweighted_gpa=composite_unweighted["gpa"],
+                    core_weighted_gpa=core_weighted["gpa"],
+                    core_unweighted_gpa=core_unweighted["gpa"],
+                    total_credits_attempted=composite_weighted["credits_attempted"],
+                    total_credits_earned=composite_weighted["credits_earned"],
                     total_courses=total_courses,
                     core_courses=core_courses,
                     ap_courses=ap_courses,

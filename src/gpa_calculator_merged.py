@@ -104,7 +104,8 @@ class MergedGPACalculator:
         return points > 0.0
 
     def calculate_gpa(
-        self, user_id: int, academic_year: str = None, weighted: bool = True
+        self, user_id: int, academic_year: str = None, weighted: bool = True,
+        core_only: bool = True
     ) -> Tuple[float, float, float]:
         """
         Calculate GPA for a student
@@ -113,12 +114,12 @@ class MergedGPACalculator:
             user_id: Student ID
             academic_year: Specific year (e.g. "2024 - 2025") or None for cumulative
             weighted: True for weighted GPA, False for unweighted
+            core_only: True for CORE courses only, False for ALL courses (composite)
 
         Returns:
             (gpa, credits_attempted, credits_earned)
         """
         # Get student's courses (include ALL for credit totals)
-        # Filter is applied inside loop for GPA (CORE only)
         student_df = self.df[self.df["User ID"] == user_id].copy()
 
         # Filter by year if specified
@@ -128,10 +129,10 @@ class MergedGPACalculator:
         if len(student_df) == 0:
             return 0.0, 0.0, 0.0
 
-        # Calculate GPA (Core Only) and Credits (All)
+        # Calculate GPA and Credits
         total_gpa_points = 0.0
         total_gpa_credits = 0.0
-        
+
         total_credits_attempted = 0.0
         total_credits_earned = 0.0
 
@@ -144,11 +145,15 @@ class MergedGPACalculator:
 
             total_credits_attempted += credits
 
-            # 1. GPA Calculation (CORE ONLY)
-            if course["CORE"] == "Yes":
+            # GPA Calculation - filter by core_only flag
+            include_in_gpa = True
+            if core_only:
+                include_in_gpa = course["CORE"] == "Yes"
+
+            if include_in_gpa:
                 # Get grade points
                 base_points = self._grade_to_points(course["Grade Earned"])
-                
+
                 # Add weight
                 if weighted:
                     try:
@@ -158,11 +163,11 @@ class MergedGPACalculator:
                     points = base_points + weight
                 else:
                     points = base_points
-                
+
                 total_gpa_points += points * credits
                 total_gpa_credits += credits
 
-            # 2. Credits Earned (ALL PASSING COURSES)
+            # Credits Earned (ALL PASSING COURSES)
             if self._is_passing(course["Grade Earned"]):
                 total_credits_earned += credits
 
@@ -197,16 +202,21 @@ class MergedGPACalculator:
         return term_gpas
 
     def calculate_cumulative_gpa(
-        self, user_id: int, weighted: bool = True
+        self, user_id: int, weighted: bool = True, core_only: bool = True
     ) -> Dict[str, float]:
         """
         Calculate cumulative GPA across all years
+
+        Args:
+            user_id: Student ID
+            weighted: True for weighted GPA, False for unweighted
+            core_only: True for CORE courses only, False for ALL courses (composite)
 
         Returns:
             dict with 'gpa', 'credits_attempted', 'credits_earned'
         """
         gpa, credits_attempted, credits_earned = self.calculate_gpa(
-            user_id, academic_year=None, weighted=weighted
+            user_id, academic_year=None, weighted=weighted, core_only=core_only
         )
 
         return {
